@@ -9,26 +9,38 @@ import sba.sms.models.Student;
 
 public class StudentService  {
 
-    // public void registerStudentToCourse(String email, int i) {
-    // }
+    // void createStudent(Student student);
+    // List<Student> getAllStudents();
+    // Student getStudentByEmail(String email);
+    // boolean validateStudent(String email, String password);
+    // void registerStudentToCourse(String email, int courseId);
+    // List<Course> getStudentCourses(String email);
 
-    // public Logger getStudentByEmail(String email) {
-    //     return null;
-    // }
+    
+    public void createStudent(Student student) {
+    }
 
-    // public void createStudent(Student student) {
-    // }
+    public List<Student> getAllStudents() {
+       return null;
+    }
 
-    // public List<Course> getStudentCourses(String email) {
-    //     return null;
-    // }
+    public Student getStudentByEmail(String email) {
+        return null;
+    }
 
-    // public boolean validateStudent(String email, String password) {
-    //     return false;
-    // }
+    public boolean validateStudent(String email, String password) {
+        return false;
+    }
 
-    // public IntPredicate getAllStudents() {
-    //     return null;
-    // }
+    public void registerStudentToCourse(String email, int i) {
+    }
+
+    public List<Course> getStudentCourses(String email) {
+        return null;
+    }
+
+
+
+
 
 }
