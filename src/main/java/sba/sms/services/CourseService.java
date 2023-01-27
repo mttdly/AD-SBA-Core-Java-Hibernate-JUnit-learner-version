@@ -15,27 +15,50 @@ public class CourseService implements CourseI {
 
     @Override
     public void createCourse(Course course) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = null;
-        try {
+
+        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.persist(course);
-            tx.commit(); // Commit Handle
-        } catch (HibernateException e) { // Base type for Hibernate exceptions
-            if (tx != null) tx.rollback(); // Rollback Handle
+            tx.commit();    // Commit Handle
+        } catch (HibernateException e) {    // Base type for Hibernate exceptions
+            if (tx != null) tx.rollback();    // Rollback Handle
             e.printStackTrace();
-        } finally {
-            session.close();
         }
     }
 
     @Override
     public List<Course> getAllCourses() {
-        return null;
+        List<Course> allCoursesList = null;
+        Transaction tx = null;    // For handling business req
+
+        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            Query<Course> query = session.createQuery("FROM Course", Course.class);
+            allCoursesList = query.getResultList();
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+        return allCoursesList;
     }
 
     @Override
     public Course getCourseById(int courseId) {
-        return null;
+        Transaction tx = null;
+        Course courseById = null;
+        
+        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            Query<Course> query = session.createQuery("FROM Course c WHERE c.id = :courseId", Course.class) // HQL query
+                .setParameter("courseId", courseId);
+            courseById = query.getSingleResult();
+            tx.commit();
+        } catch (HibernateException e) {  
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+        return courseById;
     }
 }
