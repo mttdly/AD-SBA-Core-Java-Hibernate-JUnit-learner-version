@@ -14,6 +14,8 @@ import sba.sms.utils.HibernateUtil;
 
 public class CourseService implements CourseI {
 
+    public Object createCourse;
+
     @Override
     public void createCourse(Course course) {
         Transaction tx = null;
