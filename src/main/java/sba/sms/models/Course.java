@@ -1,6 +1,8 @@
 package sba.sms.models;
 
 import java.util.List;
+import java.util.Objects;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,6 +49,11 @@ public class Course {
     List<Student> students;
 
     @Override
+    public int hashCode() {
+        return Objects.hash(id, instructor, name, students);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -55,34 +62,7 @@ public class Course {
         if (getClass() != obj.getClass())
             return false;
         Course other = (Course) obj;
-        if (id != other.id)
-            return false;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (instructor == null) {
-            if (other.instructor != null)
-                return false;
-        } else if (!instructor.equals(other.instructor))
-            return false;
-        if (students == null) {
-            if (other.students != null)
-                return false;
-        } else if (!students.equals(other.students))
-            return false;
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + id;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((instructor == null) ? 0 : instructor.hashCode());
-        result = prime * result + ((students == null) ? 0 : students.hashCode());
-        return result;
+        return id == other.id && Objects.equals(instructor, other.instructor) && Objects.equals(name, other.name)
+                && Objects.equals(students, other.students);
     }
 }
