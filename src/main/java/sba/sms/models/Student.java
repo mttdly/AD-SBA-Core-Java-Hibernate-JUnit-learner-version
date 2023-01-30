@@ -1,6 +1,7 @@
 package sba.sms.models;
 
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,8 +32,9 @@ import lombok.experimental.FieldDefaults;
 @ToString
 
 
-@Table(name = "student")
+
 @Entity
+@Table(name = "student")
 public class Student {
     @NonNull // need this NonNull or else HibernateUtil will throw errors
     @Id // Makes it PK
@@ -65,16 +67,12 @@ public class Student {
         course.getStudents().add(this);
     }
 
+
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((email == null) ? 0 : email.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((password == null) ? 0 : password.hashCode());
-        result = prime * result + ((courses == null) ? 0 : courses.hashCode());
-        return result;
+        return Objects.hash(email, name, password);
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -85,26 +83,7 @@ public class Student {
         if (getClass() != obj.getClass())
             return false;
         Student other = (Student) obj;
-        if (email == null) {
-            if (other.email != null)
-                return false;
-        } else if (!email.equals(other.email))
-            return false;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (password == null) {
-            if (other.password != null)
-                return false;
-        } else if (!password.equals(other.password))
-            return false;
-        if (courses == null) {
-            if (other.courses != null)
-                return false;
-        } else if (!courses.equals(other.courses))
-            return false;
-        return true;
+        return Objects.equals(email, other.email) && Objects.equals(name, other.name)
+                && Objects.equals(password, other.password);
     }
 }
