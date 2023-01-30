@@ -81,11 +81,15 @@ public class StudentService implements StudentI {
             if (newCourse != null) {
                 // Check if courseId param matches 
                 if (studentToRegister.getCourses().contains(newCourse)) {
-                    throw new RuntimeException("Already registered to this course");
+                    //throw new RuntimeException("Already registered to this course");
+                    System.out.println("Already registered");
+                } else {
+                    studentToRegister.addCourse(newCourse);
                 }
             }
+            
             // Use helper method of Student model
-            studentToRegister.addCourse(newCourse);
+            
             session.merge(studentToRegister);
             tx.commit();
         } catch (HibernateException e) {
@@ -131,6 +135,7 @@ public class StudentService implements StudentI {
 
         boolean validationCheck = false;
         boolean pwMatch = false;
+
 
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
