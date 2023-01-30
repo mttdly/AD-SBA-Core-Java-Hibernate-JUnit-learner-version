@@ -1,7 +1,6 @@
 package sba.sms.models;
 
 import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
 import lombok.ToString;
 
 @NoArgsConstructor
@@ -26,6 +24,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
+
 @Table(name = "course")
 @Entity
 public class Course {
@@ -46,7 +45,6 @@ public class Course {
     @ToString.Exclude // Exclude collections to avoid infinite loop
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "courses")
     List<Student> students;
-
 
     @Override
     public boolean equals(Object obj) {
