@@ -1,5 +1,6 @@
 package sba.sms.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -20,20 +21,21 @@ public class CourseService implements CourseI {
         try(Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.persist(course);
-            tx.commit();    // Commit Handle
-        } catch (HibernateException e) {    // Base type for Hibernate exceptions
-            if (tx != null) tx.rollback();    // Rollback Handle
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null) tx.rollback();
             e.printStackTrace();
         }
     }
 
     @Override
     public List<Course> getAllCourses() {
-        List<Course> allCoursesList = null;
-        Transaction tx = null;    // For handling business req
+        List<Course> allCoursesList = new ArrayList<>();
+        Transaction tx = null;
 
         try(Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
+
             Query<Course> query = session.createQuery("FROM Course", Course.class);
             allCoursesList = query.getResultList();
             tx.commit();
@@ -51,9 +53,17 @@ public class CourseService implements CourseI {
         
         try(Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            Query<Course> query = session.createQuery("FROM Course c WHERE c.id = :courseId", Course.class) // HQL query
+
+            // HQL query to return if exists
+            Query<Course> query = session.createQuery("FROM Course c WHERE c.id = :courseId", Course.class) 
                 .setParameter("courseId", courseId);
-            courseById = query.getSingleResult();
+            System.out.println(query);
+
+            if (query.getSingleResult() != null) {
+                courseById = query.getSingleResult();
+            } else {
+                throw new HibernateException("Course does not exist");
+            }
             tx.commit();
         } catch (HibernateException e) {  
             if (tx != null) tx.rollback();
