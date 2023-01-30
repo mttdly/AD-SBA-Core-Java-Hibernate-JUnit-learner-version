@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import sba.sms.dao.StudentI;
@@ -31,12 +32,14 @@ public class StudentService implements StudentI {
 
     @Override
     public Student getStudentByEmail(String email) {
-        // Create instance of Student
-        Student student = null;
-
-        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+        Student student = new Student();
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
             student = session.get(Student.class, email);
+            tx.commit();
         } catch (HibernateException e) {
+            if(tx != null) tx.rollback();
             e.printStackTrace();
         }
         return student;
@@ -44,16 +47,17 @@ public class StudentService implements StudentI {
 
     @Override
     public List<Student> getAllStudents() {
-        // Handling commit / rollback doesn't make sense for this function, so added with comments
-        // Transaction tx = null;
-        List<Student> allStudentsList= new ArrayList<>();
+        Transaction tx = null;
+        List<Student> allStudentsList = new ArrayList<>();
+
+        //final String qGetAllStudents = ;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // could change to just createQuery
-            Query<Student> query = session.createNamedQuery("Student.getAllStudents", Student.class);
-            allStudentsList = query.getResultList();
-            // tx.commit();
+            tx = session.beginTransaction();
+            Query<Student> query = session.createQuery("FROM Student", Student.class);
+            allStudentsList.addAll(query.getResultList());
+            tx.commit();
         } catch (HibernateException e) {
-            // if(tx != null) tx.rollback();
+            if(tx != null) tx.rollback();
             e.printStackTrace();
         }
         return allStudentsList;
@@ -70,6 +74,7 @@ public class StudentService implements StudentI {
             // Student student = getStudentByEmail(email);
             
             Student studentToRegister = session.get(Student.class, email);
+
             Course newCourse = session.get(Course.class, courseId);
             
             // Nullcheck
@@ -81,13 +86,14 @@ public class StudentService implements StudentI {
             }
             // Use helper method of Student model
             studentToRegister.addCourse(newCourse);
-
+            session.merge(studentToRegister);
             tx.commit();
         } catch (HibernateException e) {
             if (tx != null) tx.rollback();
             e.printStackTrace();
         }
     }
+
     @Override
     public List<Course> getStudentCourses(String email) {
         Transaction tx = null;
@@ -103,7 +109,7 @@ public class StudentService implements StudentI {
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            Query<Student> query = session.createNativeQuery(qfindStudentCourses, Student.class).setParameter("email", email);
+            NativeQuery<Student> query = session.createNativeQuery(qfindStudentCourses, Student.class).setParameter("email", email);
 
             // Adds found user to the student object
             student = query.getSingleResult();
@@ -124,43 +130,34 @@ public class StudentService implements StudentI {
         Transaction tx = null;
 
         boolean validationCheck = false;
-        boolean inSystem = false;
         boolean pwMatch = false;
-        //boolean validEmail = false;
 
-        email.trim();
-        password.trim();
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             if(!email.isEmpty() | email != null) {
-
-                // Check if student is in system
-                // inSystem = !getStudentByEmail(email).equals(null);
 
                 // pwMatch = getStudentByEmail(email).getPassword().equals(password);
 
                 // Decouple with session below
                 Student student = session.get(Student.class, email);
 
-                inSystem = !student.getEmail().equals(null);
+ 
 
                 pwMatch = student.getPassword().equals(password);
-
                 // if(email.substring(1, email.lastIndexOf(email) - 1).contains("@")) {
                 //     validEmail = true;
                 // } else {
                 //     throw new StringIndexOutOfBoundsException(email);
                 // }
-            }
-
-            if (inSystem && pwMatch /*&& validEmail*/) {
-                validationCheck = true;
+                if (pwMatch) {
+                    validationCheck = true;
+                }
             }
 
             tx.commit();     
         } catch (HibernateException | NullPointerException e) {
-            if(tx != null) tx.rollback();
+            //if(tx != null) tx.rollback();
             e.printStackTrace();
         }
         return validationCheck;
